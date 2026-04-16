@@ -1,0 +1,14 @@
+{% extends "core/email.html" %}
+
+{% block content %}
+    <h3>Récapitulatif des réservations</h3>
+    {% for meal in meals %}
+    <h4>{{ meal.name }}</h4>
+    <p>Nombre de réservations : {{ meal.count }}
+        <ul>
+        {% for res in meal.reservations %}
+            <li>{{ res.date }} {{ res.responsible }}</li>
+        {% endfor %}
+        </ul>
+    {% endfor %}
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "core/base_vue.html" %}
+
+{% load vite %}
+
+{% block header %}
+<title>HappySchool : Repas</title>
+
+{% vite %}
+{% vite "meal_reservation/js/meal_reservation.js" %}
+
+{% endblock %}
+{% block content %}
+<script>
+    const current_app = "meal_reservation";
+    const menu = {{ menu|safe }};
+</script>
+<div id="vue-app">
+    <img class="loading-spin" src="/static/img/spin.svg" alt="Loading" />
+</div>
+
+{% endblock %}
