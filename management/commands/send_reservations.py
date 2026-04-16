@@ -69,12 +69,10 @@ class Command(BaseCommand):
                     }
                 )
 
-        print(meals)
         meals = [v for (k, v) in meals.items()]
         send_email(
             to=[recipient],
             subject="Réservation des repas",
             context={"meals": meals},
             email_template="meal_reservation/reservation_summary.html",
-            from_email="robot@isln.be",
         )
