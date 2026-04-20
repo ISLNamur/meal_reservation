@@ -20,6 +20,7 @@
 import datetime
 
 from django.core.management.base import BaseCommand
+from django.db.models import ObjectDoesNotExist
 from django.utils import timezone
 
 from core.email import send_email
@@ -31,48 +32,48 @@ class Command(BaseCommand):
     help = "Send an email with the reservations of the week."
 
     def add_arguments(self, parser):
-        parser.add_argument("email")
+        parser.add_argument("--email")
+        parser.add_argument("--meal")
+        parser.add_argument("--day-interval", default=1, type=int)
 
     def handle(self, *args, **options):
         recipient = options["email"]
+        try:
+            meal = MealModel.objects.get(name=options["meal"])
+        except ObjectDoesNotExist:
+            print("Le repas n'a pas été trouvé")
+            return
+
         from_date = timezone.now()
-        to_date = from_date + datetime.timedelta(days=6)
+        to_date = from_date + datetime.timedelta(days=options["day_interval"])
 
         print(f"Sending reservations to {recipient} between {from_date} and {to_date}")
 
         reservations = ReservationModel.objects.filter(
             date__gte=from_date,
             date__lt=to_date,
+            meal=meal,
         ).order_by("date")
 
-        meals = {}
-        for r in reservations.values(
-            "meal", "date", "responsible__last_name", "responsible__first_name"
-        ):
-            if r["meal"] not in meals:
-                meals[r["meal"]] = {
-                    "name": MealModel.objects.get(id=r["meal"]).name,
-                    "count": 1,
-                    "reservations": [
-                        {
-                            "responsible": f"{r['responsible__last_name']} {r['responsible__first_name']}",
-                            "date": r["date"],
-                        }
-                    ],
-                }
-            else:
-                meals[r["meal"]]["count"] += 1
-                meals[r["meal"]]["reservations"].append(
-                    {
-                        "responsible": f"{r['responsible__last_name']} {r['responsible__first_name']}",
-                        "date": r["date"],
-                    }
-                )
+        reservations = [
+            {
+                "date": res.date,
+                "count": reservations.filter(date=res.date).count(),
+                "names": ", ".join(
+                    [
+                        f"{a} {b}"
+                        for (a, b) in reservations.filter(date=res.date).values_list(
+                            "responsible__last_name", "responsible__first_name"
+                        )
+                    ]
+                ),
+            }
+            for res in reservations.distinct("date")
+        ]
 
-        meals = [v for (k, v) in meals.items()]
         send_email(
             to=[recipient],
-            subject="Réservation des repas",
-            context={"meals": meals},
+            subject=f"Réservation des repas {meal.name}",
+            context={"reservations": reservations, "meal": meal},
             email_template="meal_reservation/reservation_summary.html",
         )
