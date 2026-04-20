@@ -225,8 +225,10 @@ export default {
         MealForm,
     },
     mounted: function () {
+        const previousMonth = DateTime.now().minus({ months: 1 }).toISODate();
+
         Promise.all([
-            axios.get("/meal_reservation/api/reservation/"),
+            axios.get(`/meal_reservation/api/reservation/?date__gte=${previousMonth}`),
             axios.get("/meal_reservation/api/meal/"),
             axios.get("/core/api/calendar/"),
         ])

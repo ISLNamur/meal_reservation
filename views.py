@@ -26,8 +26,12 @@ from django.views.generic import TemplateView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import DjangoModelPermissions
 
+from django_filters import FilterSet
+from django_filters.rest_framework.backends import DjangoFilterBackend
+
 from core.models import ResponsibleModel
 from core.utilities import get_menu
+from core.views import LargePageSizePagination
 
 from meal_reservation.models import MealModel, ReservationModel
 from meal_reservation.serializers import MealSerializer, ReservationSerializer
@@ -64,11 +68,21 @@ class MealViewset(ModelViewSet):
     permission_classes = [DjangoModelPermissions]
 
 
+class ReservationFilterset(FilterSet):
+
+    class Meta:
+        model = ReservationModel
+        fields = {"date": ["exact", "gte"]}
+
+
 class ReservationViewset(ModelViewSet):
     queryset = ReservationModel.objects.all()
     serializer_class = ReservationSerializer
 
     permission_classes = [DjangoModelPermissions]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ReservationFilterset
+    pagination_class = LargePageSizePagination
 
     def get_queryset(self) -> QuerySet[ReservationModel]:
         queryset = super().get_queryset()
