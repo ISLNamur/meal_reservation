@@ -91,7 +91,7 @@ class ReservationViewset(ModelViewSet):
         except ObjectDoesNotExist:
             return queryset.none()
 
-        queryset.filter(responsible=resp)
+        queryset = queryset.filter(responsible=resp)
 
         return queryset
 
