@@ -124,7 +124,7 @@ export default {
                 locale: frLocale,
                 height: "auto",
                 initialView: "dayGridMonth",
-                longPressDelay: 10,
+                longPressDelay: 200,
                 select: this.parseSelection,
                 selectable: true,
                 holidays: [],
