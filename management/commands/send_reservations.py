@@ -59,14 +59,14 @@ class Command(BaseCommand):
             {
                 "date": res.date,
                 "count": reservations.filter(date=res.date).count(),
-                "names": ", ".join(
-                    [
-                        f"{a} {b}"
-                        for (a, b) in reservations.filter(date=res.date).values_list(
-                            "responsible__last_name", "responsible__first_name"
-                        )
-                    ]
-                ),
+                "names": [
+                    f"{a} {b} {':' if c else ''} {c if c else ''}"
+                    for (a, b, c) in reservations.filter(date=res.date).values_list(
+                        "responsible__last_name",
+                        "responsible__first_name",
+                        "comment",
+                    )
+                ],
             }
             for res in reservations.distinct("date")
         ]
