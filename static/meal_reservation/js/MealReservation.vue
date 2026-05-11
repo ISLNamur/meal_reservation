@@ -122,6 +122,7 @@ export default {
             calendarOptions: {
                 plugins: [dayGridPlugin, interactionPlugin],
                 locale: frLocale,
+                height: "auto",
                 initialView: "dayGridMonth",
                 longPressDelay: 10,
                 select: this.parseSelection,
@@ -152,12 +153,14 @@ export default {
                 return null;
             }
 
-            return this.reservations.reduce((pV, nV) => {
-                if (nV.date < DateTime.now().toISODate()) {
-                    return pV;
-                }
-                return pV.date < nV.date ? pV : nV;
-            });
+            return this.reservations
+                .filter(r => DateTime.fromISO(r.date) >= DateTime.now())
+                .reduce((pV, nV) => {
+                    if (nV.date < DateTime.now().toISODate()) {
+                        return pV;
+                    }
+                    return pV.date < nV.date ? pV : nV;
+                });
         },
     },
     methods: {
