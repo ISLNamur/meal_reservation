@@ -68,13 +68,16 @@ class ReservationModel(models.Model):
     date = models.DateField()
     responsible = models.ForeignKey(ResponsibleModel, on_delete=models.CASCADE)
     meal = models.ForeignKey(MealModel, on_delete=models.CASCADE)
+    comment = models.CharField(max_length=200, blank=True)
 
     datetime_created = models.DateTimeField(auto_now_add=True)
     datetime_updated = models.DateTimeField(auto_now=True)
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=["date", "responsible"], name="meal_by_day_by_person")
+            models.UniqueConstraint(
+                fields=["date", "responsible"], name="meal_by_day_by_person"
+            )
         ]
         indexes = [models.Index(fields=["date"])]
 

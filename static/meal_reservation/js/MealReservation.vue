@@ -69,6 +69,11 @@
                                     style="flex-grow: 2"
                                 >
                                     {{ data.event.extendedProps.meal }}
+                                    <IBiInfoCircle
+                                        v-if="data.event.extendedProps.comment"
+                                        v-b-tooltip.focus.top="data.event.extendedProps.comment"
+                                        color="white"
+                                    />
                                 </span>
                                 <BButton
                                     size="sm"

@@ -56,6 +56,13 @@
                         </template>
                     </BFormSelect>
                 </BFormGroup>
+                <BFormGroup
+                    label="Commentaire(s)"
+                >
+                    <BFormInput
+                        v-model="comment"
+                    />
+                </BFormGroup>
                 <BFormGroup class="text-end">
                     <BButton
                         variant="outline-danger"
@@ -136,6 +143,7 @@ export default {
                     meal: this.meal,
                     date: d,
                     responsible: this.responsible,
+                    comment: this.comment,
                 };
             });
 
@@ -185,6 +193,7 @@ export default {
     data: function () {
         return {
             meal: null,
+            comment: "",
             responsible: null,
         };
     },
