@@ -33,12 +33,16 @@
                             <span v-if="i < dates.length - 1">,</span>
                         </span>
                     </div>
-                    <span
+                    <div
                         v-else
-                        class="text-secondary"
                     >
-                        Sélectionner une date en cliquant dessus (ou plusieurs dates en maintenant la pression du curseur).
-                    </span>
+                        <span class="text-secondary d-none d-lg-inline">
+                            Sélectionner une date en cliquant dessus (ou plusieurs dates en maintenant la pression du curseur).
+                        </span>
+                        <span class="text-secondary d-lg-none">
+                            Sélectionner une date en pressant un certain temps (maintenir et glisser pour plusieurs dates).
+                        </span>
+                    </div>
                 </BFormGroup>
                 <BFormGroup label="Type de repas">
                     <BFormSelect
@@ -77,7 +81,6 @@ import axios from "axios";
 import { DateTime } from "luxon";
 
 import { useToastController } from "bootstrap-vue-next";
-import { errorMessages } from "vue/compiler-sfc";
 
 const token = { xsrfCookieName: "csrftoken", xsrfHeaderName: "X-CSRFToken" };
 
