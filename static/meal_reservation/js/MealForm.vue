@@ -44,7 +44,15 @@
                         </span>
                     </div>
                 </BFormGroup>
-                <BFormGroup label="Type de repas">
+                <BFormGroup
+                    label="Type de repas"
+                >
+                    <template #description>
+                        <span
+                            v-if="meal"
+                            v-html="meals.find(m => m.id === meal).description"
+                        />
+                    </template>
                     <BFormSelect
                         v-model="meal"
                         :options="availableMeals"
@@ -58,6 +66,7 @@
                 </BFormGroup>
                 <BFormGroup
                     label="Commentaire(s)"
+                    style="display: none;"
                 >
                     <BFormInput
                         v-model="comment"
