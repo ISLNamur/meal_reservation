@@ -41,19 +41,25 @@ class Command(BaseCommand):
         try:
             meal = MealModel.objects.get(name=options["meal"])
         except ObjectDoesNotExist:
-            print("Le repas n'a pas été trouvé")
+            print("Aucun repas n'a pas été trouvé")
             return
 
-        from_date = timezone.now()
+        from_date = timezone.now().date()
         to_date = from_date + datetime.timedelta(days=options["day_interval"])
 
-        print(f"Sending reservations to {recipient} between {from_date} and {to_date}")
+        print(
+            f"Sending reservations to {recipient} between {from_date} and {to_date} about {options['meal']}."
+        )
 
         reservations = ReservationModel.objects.filter(
             date__gte=from_date,
-            date__lt=to_date,
+            date__lte=to_date,
             meal=meal,
         ).order_by("date")
+
+        if not reservations.exists():
+            print("Pas de réservation de repas.")
+            return
 
         reservations = [
             {
@@ -73,7 +79,7 @@ class Command(BaseCommand):
 
         send_email(
             to=[recipient],
-            subject=f"Réservation des repas {meal.name}",
+            subject=f"Réservation des repas {options['meal']}",
             context={"reservations": reservations, "meal": meal},
             email_template="meal_reservation/reservation_summary.html",
         )
