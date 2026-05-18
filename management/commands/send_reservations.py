@@ -39,7 +39,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         recipient = options["email"]
         try:
-            meal = MealModel.objects.get(name=options["meal"])
+            meals = MealModel.objects.filter(name__icontains=options["meal"])
         except ObjectDoesNotExist:
             print("Aucun repas n'a pas été trouvé")
             return
@@ -51,35 +51,41 @@ class Command(BaseCommand):
             f"Sending reservations to {recipient} between {from_date} and {to_date} about {options['meal']}."
         )
 
-        reservations = ReservationModel.objects.filter(
-            date__gte=from_date,
-            date__lte=to_date,
-            meal=meal,
-        ).order_by("date")
+        reservations_by_meal = []
+        for meal in meals:
+            reservations = ReservationModel.objects.filter(
+                date__gte=from_date,
+                date__lte=to_date,
+                meal=meal,
+            ).order_by("date")
 
-        if not reservations.exists():
-            print("Pas de réservation de repas.")
+            if not reservations.exists():
+                continue
+
+            reservations = [
+                {
+                    "date": res.date,
+                    "count": reservations.filter(date=res.date).count(),
+                    "names": [
+                        f"{a} {b} {':' if c else ''} {c if c else ''}"
+                        for (a, b, c) in reservations.filter(date=res.date).values_list(
+                            "responsible__last_name",
+                            "responsible__first_name",
+                            "comment",
+                        )
+                    ],
+                }
+                for res in reservations.distinct("date")
+            ]
+            reservations_by_meal.append({"meal": meal, "reservations": reservations})
+
+        if not reservations_by_meal:
+            print(f"Pas de réservation de repas pour {options['meal']}.")
             return
-
-        reservations = [
-            {
-                "date": res.date,
-                "count": reservations.filter(date=res.date).count(),
-                "names": [
-                    f"{a} {b} {':' if c else ''} {c if c else ''}"
-                    for (a, b, c) in reservations.filter(date=res.date).values_list(
-                        "responsible__last_name",
-                        "responsible__first_name",
-                        "comment",
-                    )
-                ],
-            }
-            for res in reservations.distinct("date")
-        ]
 
         send_email(
             to=[recipient],
             subject=f"Réservation des repas {options['meal']}",
-            context={"reservations": reservations, "meal": meal},
+            context={"reservations_by_meal": reservations_by_meal},
             email_template="meal_reservation/reservation_summary.html",
         )

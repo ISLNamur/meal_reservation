@@ -1,15 +1,17 @@
 {% extends "core/email.html" %}
 
 {% block content %}
-    <h3>Récapitulatif des réservations pour {{ meal.name }}</h3>
-    {% for res in reservations %}
-    <p><strong>Date : {{ res.date }}</strong></p>
-    <p>Nombre de réservations : {{ res.count }}</p>
-    <p>Personnes</p>
-    <ul>
-        {% for person in res.names %}
-        <li>{{ person }}</li>
+    {% for res_by_meal in reservations_by_meal %}
+        <h3>Récapitulatif des réservations pour {{ res_by_meal.meal.name }}</h3>
+        {% for res in res_by_meal.reservations %}
+        <p><strong>Date : {{ res.date }}</strong></p>
+        <p>Nombre de réservations : {{ res.count }}</p>
+        <p>Personnes</p>
+        <ul>
+            {% for person in res.names %}
+            <li>{{ person }}</li>
+            {% endfor %}
+        </ul>
         {% endfor %}
-    </ul>
     {% endfor %}
 {% endblock %}
