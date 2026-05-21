@@ -21,5 +21,11 @@ from django.contrib import admin
 
 from meal_reservation.models import MealModel, ReservationModel
 
+
+class ReservationAdmin(admin.ModelAdmin):
+    list_display = ["date", "meal", "responsible"]
+    ordering = ["-date", "meal"]
+
+
 admin.site.register(MealModel)
-admin.site.register(ReservationModel)
+admin.site.register(ReservationModel, ReservationAdmin)
