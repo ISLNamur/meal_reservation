@@ -181,6 +181,16 @@ export default {
             };
         },
         removeEvent: function (evt) {
+            const meal = this.meals.find(m => m.name === evt.extendedProps.meal);
+            if (evt.extendedProps.dateObject.toISODate() < meal.first_available_date) {
+                this.create({
+                    body: "Il n'est plus possible de supprimer cet événement.",
+                    okOnly: true,
+                    okVariant: "danger",
+                });
+                return;
+            }
+
             this.create({
                 body: `Êtes-vous sûr de vouloir supprimer le repas «${evt.extendedProps.meal}» du ${evt.extendedProps.dateObject.toLocaleString()} ?`,
                 okTitle: "Oui",
