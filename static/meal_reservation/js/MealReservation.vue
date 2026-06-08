@@ -104,7 +104,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import frLocale from "@fullcalendar/core/locales/fr";
 
-import { useModalController, useToastController } from "bootstrap-vue-next";
+import { useModal, useToast } from "bootstrap-vue-next";
 
 import MealForm from "./MealForm.vue";
 
@@ -112,8 +112,8 @@ const token = { xsrfCookieName: "csrftoken", xsrfHeaderName: "X-CSRFToken" };
 
 export default {
     setup: function () {
-        const { show } = useToastController();
-        const { create } = useModalController();
+        const { show } = useToast();
+        const { create } = useModal();
         return { show, create };
     },
     data: function () {
@@ -187,7 +187,7 @@ export default {
                     body: "Il n'est plus possible de supprimer cet événement.",
                     okOnly: true,
                     okVariant: "danger",
-                });
+                }).show();
                 return;
             }
 
@@ -196,7 +196,7 @@ export default {
                 okTitle: "Oui",
                 cancelTitle: "Annuler",
                 okVariant: "danger",
-            })
+            }).show()
                 .then((remove) => {
                     if (!remove.ok) return;
 
