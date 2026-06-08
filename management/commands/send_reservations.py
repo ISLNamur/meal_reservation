@@ -20,10 +20,13 @@
 import datetime
 
 from django.core.management.base import BaseCommand
+from django.conf import settings
 from django.db.models import ObjectDoesNotExist
 from django.utils import timezone
 
 from core.email import send_email
+from core.people import get_privileged_group
+from core.models import ResponsibleModel
 
 from meal_reservation.models import MealModel, ReservationModel
 
@@ -57,7 +60,7 @@ class Command(BaseCommand):
                 date__gte=from_date,
                 date__lte=to_date,
                 meal=meal,
-            ).order_by("date")
+            ).order_by("date", "responsible__user")
 
             if not reservations.exists():
                 continue
@@ -67,11 +70,17 @@ class Command(BaseCommand):
                     "date": res.date,
                     "count": reservations.filter(date=res.date).count(),
                     "names": [
-                        f"{a} {b} {':' if c else ''} {c if c else ''}"
-                        for (a, b, c) in reservations.filter(date=res.date).values_list(
+                        {
+                            "name": f"{a} {b} {':' if c else ''} {c if c else ''}",
+                            "is_teacher": self._is_only_teacher(d),
+                        }
+                        for (a, b, c, d) in reservations.filter(
+                            date=res.date
+                        ).values_list(
                             "responsible__last_name",
                             "responsible__first_name",
                             "comment",
+                            "responsible__pk",
                         )
                     ],
                 }
@@ -89,3 +98,11 @@ class Command(BaseCommand):
             context={"reservations_by_meal": reservations_by_meal},
             email_template="meal_reservation/reservation_summary.html",
         )
+
+    def _is_only_teacher(self, responsible_pk) -> bool:
+        resp = ResponsibleModel.objects.get(pk=responsible_pk)
+        group = get_privileged_group(resp.user)
+        if group == settings.TEACHER_GROUP:
+            return True
+
+        return False

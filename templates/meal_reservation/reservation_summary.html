@@ -6,10 +6,20 @@
         {% for res in res_by_meal.reservations %}
         <p><strong>Date : {{ res.date }}</strong></p>
         <p>Nombre de réservations : {{ res.count }}</p>
-        <p>Personnes</p>
+        <p>Enseignant·e·s</p>
         <ul>
             {% for person in res.names %}
-            <li>{{ person }}</li>
+            {% if person.is_teacher %}
+            <li>{{ person.name }}</li>
+            {% endif %}
+            {% endfor %}
+        </ul>
+        <p>Autres</p>
+        <ul>
+            {% for person in res.names %}
+            {% if not person.is_teacher %}
+            <li>{{ person.name }}</li>
+            {% endif %}
             {% endfor %}
         </ul>
         {% endfor %}
