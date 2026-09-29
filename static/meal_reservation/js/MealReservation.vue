@@ -28,6 +28,17 @@
                     <IBiPlus />
                     Ajouter
                 </BButton>
+                <BButton
+                    class="ms-2"
+                    href="https://www.isln.be/category/repas/"
+                    target="_blank"
+                    rel="noopener"
+                    variant="outline-primary"
+                    size="sm"
+                >
+                    Menu des repas
+                    <IBiBoxArrowUpRight style="font-size: 0.8em;" />
+                </BButton>
             </BCol>
             <BCol
                 cols="8"
